@@ -45,3 +45,5 @@ coverage.xml
 .env
 .env
 .vscode
+
+venv/

@@ -4,7 +4,7 @@ from ..segments.utilities import split_segment
 
 class Patient:
 	identification = 'PAT'
-	print("hi pat")
+
 	identifier = Identifier()
 	relationship_code = ''
 
