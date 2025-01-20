@@ -9,7 +9,7 @@ from ..segments.amount import Amount as AmountSegment
 from ..segments.utilities import find_identifier
 from ..segments.diagnosis import Diagnosis as DiagnosisSegment
 from ..segments.note import Note as NoteSegment
-from ..loops.service import Service as ServiceLoop
+
 from ..loops.payer import Payer as PayerLoop
 
 from ..segments.subscriber import Subscriber as SubscriberSegment
@@ -18,6 +18,14 @@ from ..loops.subscriber import Subscriber as SubscriberLoop
 from ..segments.patient import Patient as PatientSegment
 from ..segments.billingprovider import Billingprovider as BillingproviderSegment
 from ..segments.utilities import split_segment  
+
+from ..segments.serviceline import ServiceLine as ServiceLineSegment
+
+# 837 claims are institutional claims
+from ..loops.service import ServiceInstitutional as InstitutionalServiceLoop
+
+# 837P claims are professional claims
+from ..loops.service import ServicelineSegmentProfessionalSegment as ProfessionalServiceLoop
 
 
 class Claim:
@@ -32,7 +40,7 @@ class Claim:
 			self,
 			claim: ClaimSegment = None,
 			entities: List[EntitySegment] = None,
-			services: List[ServiceLoop] = None,
+			services: List[ServiceLineSegment] = None,
 			references: List[ReferenceSegment] = None,
 			dates: List[DateSegment] = None,
 			amount: AmountSegment = None,
@@ -107,11 +115,11 @@ class Claim:
 				if segment is None:
 					segment = segments.__next__()
 				
-				identifier = find_identifier(segment)
-				identifier2=split_segment(segment)
+				identifier  = find_identifier(segment)
+				identifier2 = split_segment(segment)
 
-				if (identifier == ServiceLoop.initiating_identifier):
-					service, segment, segments = ServiceLoop.build(segment, segments)
+				if (identifier == InstitutionalServiceLoop.initiating_identifier):
+					service, segment, segments = InstitutionalServiceLoop.build(segment, segments)
 					claim.services.append(service)
 
 				elif (identifier2[0] == EntitySegment.identification and   identifier2[1] != '77')  :

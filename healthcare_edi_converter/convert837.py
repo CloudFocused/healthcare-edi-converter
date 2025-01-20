@@ -3,7 +3,7 @@ from typing import List, Iterator, Optional
 from collections import namedtuple
 import pandas as pd
 from .loops.claim import Claim as ClaimLoop
-from .loops.service import Service as ServiceLoop
+from .loops.service import ServiceInstitutional as ServiceLoop
 from .segments.utilities import find_identifier,split_segment
 from .loops.patient import Patient as PatientLoop
 from .loops.billingprovider import Billingprovider as BillingproviderLoop
@@ -21,6 +21,8 @@ class Convert837(Converter_Base):
         parse_edi() method to parse the 837 file content.
         generate_edi() method to generate the 837 file content from dataframes.
     """
+
+
     def __init__(self, edi_content: str):
         self.edi_content = edi_content
 
@@ -39,11 +41,8 @@ class Convert837(Converter_Base):
         billingprovider=[]
         subscriber=[]
         
-        #print(self.segments)
-      
+    
         self.segments = iter(self.segments)
-
-       
 
         segment = None
         pat=PatientLoop()
@@ -54,9 +53,7 @@ class Convert837(Converter_Base):
 
 
         while True:
-            print(self.segments)
             response = self.build_attribute(segment, self.segments)
- 
             segment = response.segment
             
 
@@ -64,44 +61,55 @@ class Convert837(Converter_Base):
             if response.segments is None:
                 break
 
-            if response.key == 'interchange':
-                interchange = response.value
+            # based on the segment build the appropriate object
+            match response.key:
+                case None:
+                    pass
+                case 'interchange':
+                    interchange = response.value
 
-            if response.key == 'financial information':
-                financial_information = response.value
+                case 'financial information':
+                    financial_information = response.value
 
-            if response.key == 'organization':
-                organizations.append(response.value)
+                case 'organization':
+                    organizations.append(response.value)
 
-            if response.key == 'claim':
-                response.value.patient=pat
-                response.value.billingprovider=bp
-                response.value.subscriber=sub
-                response.value.submitter=submit
-                response.value.receiver=receive
+                case 'claim':
+                    response.value.patient = pat
+                    response.value.billingprovider = bp
+                    response.value.subscriber = sub
+                    response.value.submitter = submit
+                    response.value.receiver = receive
+                    claims.append(response.value)
 
-                claims.append(response.value)
+                case 'patient':
+                    patient.append(response.value)
+                    pat = response.value
 
-            if response.key == 'patient':
-                patient.append(response.value)
-                pat=response.value
+                case 'billingprovider':
+                    billingprovider.append(response.value)
+                    bp = response.value
 
-            if response.key == 'billingprovider':
-                billingprovider.append(response.value)
-                bp=response.value
+                case 'subscriber':
+                    subscriber.append(response.value)
+                    sub = response.value
+
+                case 'submitter':
+                    submit = response.value
+
+                case 'receiver':
+                    receive = response.value
                 
-            if response.key == 'subscriber':
-                subscriber.append(response.value)
-                sub=response.value
-
-            if response.key == 'submitter':
-                submit=response.value
-
-            if response.key == 'receiver':
-                receive=response.value
-
+                case _:
+                    pass
 
         return claims
+
+
+
+
+
+
 
 
     def build_attribute(cls, segment: Optional[str], segments: Iterator[str]) -> BuildAttributeResponse:
@@ -122,39 +130,33 @@ class Convert837(Converter_Base):
         identifier = find_identifier(segment)
         identifier2= split_segment(segment)
         
-        if identifier == PatientLoop.initiating_identifier:
-            patient, segments, segment = PatientLoop.build(segment, segments)
-
+        match identifier:
+            case PatientLoop.initiating_identifier:
+                patient, segments, segment = PatientLoop.build(segment, segments)
+                return BuildAttributeResponse('patient', patient, segment, segments)
             
-            return BuildAttributeResponse('patient', patient, segment, segments)
-        
-        elif identifier == ClaimLoop.initiating_identifier:
-
-            claim, segments, segment = ClaimLoop.build(segment, segments)
+            case ClaimLoop.initiating_identifier:
+                claim, segments, segment = ClaimLoop.build(segment, segments)
+                return BuildAttributeResponse('claim', claim, segment, segments)
             
-            return BuildAttributeResponse('claim', claim, segment, segments)
-        
-        elif identifier == SubscriberLoop.initiating_identifier:
-            subscriber, segments, segment = SubscriberLoop.build(segment, segments)
+            case SubscriberLoop.initiating_identifier:
+                subscriber, segments, segment = SubscriberLoop.build(segment, segments)
+                return BuildAttributeResponse('subscriber', subscriber, segment, segments)
             
-            return BuildAttributeResponse('subscriber', subscriber, segment, segments)
-        
-        elif (identifier2[0]== BillingproviderLoop.initiating_identifier and identifier2[1] == 'BI' ):
-            billingprovider, segments, segment = BillingproviderLoop.build(segment, segments)
-            
-            return BuildAttributeResponse('billingprovider', billingprovider, segment, segments)
-        elif (identifier2[0]== PayerLoop.initiating_identifier and identifier2[1] == '41' ):
-            submitter, segments, segment = PayerLoop.build(segment, segments)
-            
-            return BuildAttributeResponse('submitter', submitter, segment, segments)
-        
-        elif (identifier2[0]== PayerLoop.initiating_identifier and identifier2[1] == '40' ):
-            receiver, segments, segment = PayerLoop.build(segment, segments)
-            
-            return BuildAttributeResponse('receiver', receiver, segment, segments)
-
-        else:
-            return BuildAttributeResponse(None, None, None, segments)
+            case _ if identifier2[0] == BillingproviderLoop.initiating_identifier and identifier2[1] == 'BI':
+                billingprovider, segments, segment = BillingproviderLoop.build(segment, segments)
+                return BuildAttributeResponse('billingprovider', billingprovider, segment, segments)
+                
+            case _ if identifier2[0] == PayerLoop.initiating_identifier and identifier2[1] == '41':
+                submitter, segments, segment = PayerLoop.build(segment, segments)
+                return BuildAttributeResponse('submitter', submitter, segment, segments)
+                
+            case _ if identifier2[0] == PayerLoop.initiating_identifier and identifier2[1] == '40':
+                receiver, segments, segment = PayerLoop.build(segment, segments)
+                return BuildAttributeResponse('receiver', receiver, segment, segments)
+                
+            case _:
+                return BuildAttributeResponse(None, None, None, segments)
 
 
 

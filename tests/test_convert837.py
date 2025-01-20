@@ -17,8 +17,6 @@ class TestHealthClaimConverter(unittest.TestCase):
         result = converter
         #ASSERT
         self.assertIn("Claim", result)
-
- 
         
 
 if __name__ == "__main__":
