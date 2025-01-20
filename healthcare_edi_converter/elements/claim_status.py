@@ -40,10 +40,14 @@ _REGISTRY = [
 	Status('20', 'processed as secondary, forwarded to additional payer(s)', PayerClassification.SECONDARY),
 	Status('21', 'processed as tertiary, forwarded to additional payer(s)', PayerClassification.TERTIARY),
 	Status('22', 'reversal of previous payment', PayerClassification.UNSPECIFIED),
+	Status('99', 'uncategorized', PayerClassification.UNKNOWN),
 ]
 
 
 def _lookup_status(code: str) -> Status:
+	if code =='':
+		return Status('99', 'uncategorized', PayerClassification.UNKNOWN)
+	
 	status = [s for s in _REGISTRY if s.code == code]
 	if len(status) == 0:
 		warn(f'ClaimStatus: Code {code} does not match a status in the edi-835-parser claim status registry.')

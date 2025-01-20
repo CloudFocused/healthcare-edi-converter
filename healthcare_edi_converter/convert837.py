@@ -9,26 +9,42 @@ from .loops.patient import Patient as PatientLoop
 from .loops.billingprovider import Billingprovider as BillingproviderLoop
 from .loops.subscriber import Subscriber as SubscriberLoop
 from .loops.payer import Payer as PayerLoop
+from healthcare_edi_converter.convert_base import Converter_Base
 
 BuildAttributeResponse = namedtuple('BuildAttributeResponse', 'key value segment segments')
 
-class HealthClaimConverter:
+
+
+class Convert837(Converter_Base):
+    """
+        Convert837 class to handle the conversion of 837 files by implementing the Converter_Base interface.
+        parse_edi() method to parse the 837 file content.
+        generate_edi() method to generate the 837 file content from dataframes.
+    """
     def __init__(self, edi_content: str):
         self.edi_content = edi_content
 
-    def parse(self) -> dict:
+    def parse_edi(self) -> dict:
 
-
-        segments = self.edi_content.split('~')
-        segments = [segment.strip() for segment in segments]
+        if self.edi_content is None:
+            return {}
+        
+        # base class has the x12 parsing logic because it's shared among all the types
+        if self.parse_x12() == False:
+            return {}
 
         claims = []
         organizations = []
         patient=[]
         billingprovider=[]
         subscriber=[]
+        
+        #print(self.segments)
+      
+        self.segments = iter(self.segments)
 
-        segments = iter(segments)
+       
+
         segment = None
         pat=PatientLoop()
         bp=BillingproviderLoop()
@@ -38,10 +54,11 @@ class HealthClaimConverter:
 
 
         while True:
-            response = self.build_attribute(segment, segments)
-
+            print(self.segments)
+            response = self.build_attribute(segment, self.segments)
+ 
             segment = response.segment
-            segments = response.segments
+            
 
             # no more segments to parse
             if response.segments is None:
@@ -57,7 +74,6 @@ class HealthClaimConverter:
                 organizations.append(response.value)
 
             if response.key == 'claim':
-
                 response.value.patient=pat
                 response.value.billingprovider=bp
                 response.value.subscriber=sub
@@ -71,12 +87,10 @@ class HealthClaimConverter:
                 pat=response.value
 
             if response.key == 'billingprovider':
-
                 billingprovider.append(response.value)
                 bp=response.value
                 
             if response.key == 'subscriber':
-
                 subscriber.append(response.value)
                 sub=response.value
 
@@ -85,18 +99,20 @@ class HealthClaimConverter:
 
             if response.key == 'receiver':
                 receive=response.value
-        print(organizations)
 
 
-
-        #return parsed_segments
-    
-      
-        
         return claims
 
 
     def build_attribute(cls, segment: Optional[str], segments: Iterator[str]) -> BuildAttributeResponse:
+        """
+            Build an attribute based on the segment and segments.
+            Args:
+                segment (Optional[str]): The current segment.
+                segments (Iterator[str]): The iterator of segments.
+            Returns:
+                BuildAttributeResponse: A namedtuple containing the key, value, segment, and remaining segments.
+        """
         if segment is None:
             try:
                 segment = segments.__next__()
@@ -104,7 +120,7 @@ class HealthClaimConverter:
                 return BuildAttributeResponse(None, None, None, None)
         
         identifier = find_identifier(segment)
-        identifier2=split_segment(segment)
+        identifier2= split_segment(segment)
         
         if identifier == PatientLoop.initiating_identifier:
             patient, segments, segment = PatientLoop.build(segment, segments)
@@ -143,5 +159,16 @@ class HealthClaimConverter:
 
 
 
-    def to_json(self) -> str:
-        return json.dumps(self.parse(), indent=4)
+
+
+
+
+
+
+
+
+
+
+    def generate_edi(self, data):
+        return super().generate_edi(data)
+

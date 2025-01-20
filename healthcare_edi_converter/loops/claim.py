@@ -98,9 +98,8 @@ class Claim:
 		claim = Claim()
 		claim.claim = ClaimSegment(segment)
 		identifier2=split_segment(segment)
-		# print(claim)
+		
 		segment = segments.__next__()
-		# print("hello")
 		
 		while True:
 
