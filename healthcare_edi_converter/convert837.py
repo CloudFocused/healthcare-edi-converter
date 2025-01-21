@@ -13,7 +13,7 @@ from .loops.payer import Payer as PayerLoop
 
 from .models.claim_dto import ClaimData_Flat as ClaimData_Flat
 from .models.claim_dto import ClaimLine as ClaimLine
-
+from .utils import flatten_object
 from healthcare_edi_converter.convert_base import Converter_Base
 
 BuildAttributeResponse = namedtuple('BuildAttributeResponse', 'key value segment segments')
@@ -40,9 +40,7 @@ class Convert837(Converter_Base):
             return {}
 
         claims = []
-        claims_dto=[]
-        claim_dto:ClaimData_Flat = None
-
+        flat_objects = []
 
         organizations = []
         patient=[]
@@ -88,8 +86,9 @@ class Convert837(Converter_Base):
                     response.value.submitter = submit
                     response.value.receiver = receive
                     claims.append(response.value)
-                    claim_dto = self.build_flat_claim(response.value)
-                    claims_dto.append(claim_dto)
+
+                    flat_obj = flatten_object(response.value)
+                    flat_objects.append(flat_obj)
 
                 case 'patient':
                     patient.append(response.value)
@@ -112,7 +111,7 @@ class Convert837(Converter_Base):
                 case _:
                     pass
 
-        df = pd.DataFrame(claims_dto)
+        df = pd.DataFrame(flat_objects)
                 
         return df
 
