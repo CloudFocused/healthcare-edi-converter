@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import List, Optional
 
 @dataclass
@@ -8,6 +8,10 @@ class Subscriber:
     dob: Optional[str] = None  # Date of Birth (YYYY-MM-DD)
     gender: Optional[str] = None  # Gender (M/F/U)
     subscriber_id: Optional[str] = None  # Subscriber's ID assigned by the payer
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
+
 
 @dataclass
 class Payer:
@@ -15,14 +19,20 @@ class Payer:
     payer_id: str  # Payer ID
     address: Optional[str] = None  # Address of the payer
     contact_number: Optional[str] = None  # Payer's contact number
-
+    
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
+    
 @dataclass
 class RenderingProvider:
     name: str  # Name of the rendering provider
     npi: str  # National Provider Identifier
     specialty: Optional[str] = None  # Provider's specialty
     address: Optional[str] = None  # Address of the rendering provider
-
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
 @dataclass
 class ClaimData:
     """
@@ -31,8 +41,8 @@ class ClaimData:
     claim_id: str  # Unique Claim ID
     claim_date: Optional[str] = None
 
-    patient_first_name: str
-    patient_last_name: str
+    patient_first_name: Optional[str] = None
+    patient_last_name: Optional[str] = None
     patient_dob: Optional[str] = None  # Date of Birth (YYYY-MM-DD)
     patient_gender: Optional[str] = None  # Gender (M/F/U)
     
@@ -55,7 +65,10 @@ class ClaimData:
 
     # Claim Lines
     claim_lines: List["ClaimLine"] = field(default_factory=list)  # List of line items
-
+   
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
 
 
 @dataclass
@@ -70,7 +83,9 @@ class ClaimLine:
     units: int = 1  # Number of units for the service
     modifier: Optional[str] = None  # Service modifier (if any)
     diagnosis_pointer: List[str] = field(default_factory=list)  # Links to diagnoses
-
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
 
 
 @dataclass
@@ -82,25 +97,25 @@ class ClaimData_Flat:
      # Unique Claim ID
     claim_id: str  # Unique Claim ID
     claim_date: Optional[str] = None
-    subscriber_first_name: str
-    subscriber_last_name: str
+    subscriber_first_name: Optional[str]=None
+    subscriber_last_name: Optional[str] = None
     subscriber_dob: Optional[str] = None
     subscriber_gender: Optional[str] = None
-    subscriber_id: str
+    subscriber_id: Optional[str]    = None
     
     # Payer Information
     payer_name: Optional[str] = None
     payer_id: Optional[str] = None
     
     # Rendering Provider Information
-    provider_name: str
-    provider_npi: str
+    provider_name: Optional[str] = None
+    provider_npi: Optional[str] = None
     provider_specialty: Optional[str] = None
     provider_address: Optional[str] = None
     
     # Patient Information
-    patient_first_name: str
-    patient_last_name: str
+    patient_first_name: Optional[str] = None
+    patient_last_name: Optional[str] = None
     patient_dob: Optional[str] = None  # Date of Birth (YYYY-MM-DD)
     patient_gender: Optional[str] = None  # Gender (M/F/U)
     
@@ -111,6 +126,13 @@ class ClaimData_Flat:
     # Information used to track/trace the claim
     claim_source: Optional[str] = None
     trace_number: Optional[str] = None
+
+    def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        return asdict(self)
+
+
+
 
 
 

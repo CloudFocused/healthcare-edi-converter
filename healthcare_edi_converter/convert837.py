@@ -1,5 +1,6 @@
 import json
 from typing import List, Iterator, Optional
+from dataclasses import dataclass, asdict
 from collections import namedtuple
 import pandas as pd
 from .loops.claim import Claim as ClaimLoop
@@ -9,10 +10,13 @@ from .loops.patient import Patient as PatientLoop
 from .loops.billingprovider import Billingprovider as BillingproviderLoop
 from .loops.subscriber import Subscriber as SubscriberLoop
 from .loops.payer import Payer as PayerLoop
+
+from .models.claim_dto import ClaimData_Flat as ClaimData_Flat
+from .models.claim_dto import ClaimLine as ClaimLine
+
 from healthcare_edi_converter.convert_base import Converter_Base
 
 BuildAttributeResponse = namedtuple('BuildAttributeResponse', 'key value segment segments')
-
 
 
 class Convert837(Converter_Base):
@@ -26,7 +30,7 @@ class Convert837(Converter_Base):
     def __init__(self, edi_content: str):
         self.edi_content = edi_content
 
-    def parse_edi(self) -> dict:
+    def parse_edi(self) -> pd.DataFrame:
 
         if self.edi_content is None:
             return {}
@@ -36,12 +40,15 @@ class Convert837(Converter_Base):
             return {}
 
         claims = []
+        claims_dto=[]
+        claim_dto:ClaimData_Flat = None
+
+
         organizations = []
         patient=[]
         billingprovider=[]
         subscriber=[]
         
-    
         self.segments = iter(self.segments)
 
         segment = None
@@ -81,6 +88,8 @@ class Convert837(Converter_Base):
                     response.value.submitter = submit
                     response.value.receiver = receive
                     claims.append(response.value)
+                    claim_dto = self.build_flat_claim(response.value)
+                    claims_dto.append(claim_dto)
 
                 case 'patient':
                     patient.append(response.value)
@@ -103,12 +112,43 @@ class Convert837(Converter_Base):
                 case _:
                     pass
 
-        return claims
+        df = pd.DataFrame(claims_dto)
+                
+        return df
 
 
+    def build_flat_claim(self, claim: ClaimLoop) -> ClaimData_Flat:
+        """
+            Build a flat claim from a claim object.
+            Args:
+                claim (ClaimLoop): The claim object.
+            Returns:
+                ClaimData_Flat: The flat claim object.
+        """
 
+        return ClaimData_Flat(  claim_id=claim.claim.marker,
+                                claim_date=None,
+                                subscriber_first_name = claim.subscriber.payer[0].entities.first_name,
+                                subscriber_last_name =claim.subscriber.payer[0].entities.last_name,
+                                subscriber_dob = None,
+                                subscriber_gender = None,
+                                subscriber_id = claim.subscriber.payer[0].entities.identification_code,
+                                payer_name = claim.subscriber.payer[1].entities.name,
+                                payer_id = claim.subscriber.payer[1].entities.identification_code,
+                                provider_name = claim.rendering_provider.name,
+                                provider_npi = claim.rendering_provider.identification_code,
+                                provider_specialty = claim.submitter.demographic_information,
+                                provider_address = claim.submitter.address,
 
+                                patient_first_name= '',
+                                patient_last_name='',
+                                patient_dob='',
+                                patient_gender='',
 
+                                claim_amount = claim.claim.charge_amount,
+                                diagnosis_codes = claim.diagnosis[0].identification
+                              
+                              )
 
 
 
@@ -157,18 +197,6 @@ class Convert837(Converter_Base):
                 
             case _:
                 return BuildAttributeResponse(None, None, None, segments)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def generate_edi(self, data):
