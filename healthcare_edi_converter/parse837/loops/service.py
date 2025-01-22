@@ -12,6 +12,7 @@ from ..segments.serviceline import Serviceline_Institutional as ServicelineInsti
 from ..segments.serviceline import Serviceline_Professional as ServicelineSegmentProfessionalSegment
 from ..segments.drug_identification import Drug_Identification as Drug_IdentificationSegment
 from ..segments.drug_quantity import Drug_Quantity as Drug_QuantitySegment
+from ..segments.note import Note as NoteSegment
 
 from ..segments.utilities import find_identifier
 
@@ -36,6 +37,7 @@ class ServiceInstitutional:
 			service_line_adjudication: Service_Line_AdjudicationSegment = None,
 			drug_identification:Drug_IdentificationSegment=None,
 			drug_quantity:Drug_QuantitySegment=None,
+			notes: List[NoteSegment] = None,
 
 	):
 		self.service = service
@@ -47,7 +49,7 @@ class ServiceInstitutional:
 		self.service_line_adjudication = service_line_adjudication 
 		self.drug_identification=drug_identification
 		self.drug_quantity=drug_quantity
-	
+		self.notes = notes if notes else []
 
 	def __repr__(self):
 		return '\n'.join(str(item) for item in self.__dict__.items())
@@ -89,7 +91,10 @@ class ServiceInstitutional:
 					case ReferenceSegment.identification:
 						reference = ReferenceSegment(segment)
 						service.references.append(reference)
-
+					
+					case NoteSegment.identification:
+						service.notes.append(NoteSegment(segment))
+					
 					case ServiceAdjustmentSegment.identification:
 						service.adjustments.append(ServiceAdjustmentSegment(segment))
 
