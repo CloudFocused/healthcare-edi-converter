@@ -1,6 +1,7 @@
 
 from healthcare_edi_converter.convert_base import Converter_Base
 from healthcare_edi_converter.convert837 import Convert837
+from healthcare_edi_converter.generate_837 import segments
 from healthcare_edi_converter.models.claim_dto import ClaimData, ClaimLine, ClaimData_Flat
 
 from abc import ABC, abstractmethod
@@ -53,30 +54,53 @@ def generate_edi(sender: str, reciever: str, claim: ClaimData) -> str:
     # **********************************
 
     # 1000 Loops SUBMITTER / RECIEVER
+    submitter_segment = segments.generate_nm1_segment('41',2,None,sender,'46','1111111')
+    edi_segments.append(submitter_segment)
+    
+
+
+    reciever_segment = segments.generate_nm1_segment('46',2,None,reciever,'46','2222222')
+    edi_segments.append(reciever_segment)
+
+
 
 
     # 2000 Loops BILLING PROVIDER
+    hl_segment = segments.generate_hl_segment(1, None, '20', '1')
+    edi_segments.append(hl_segment)
+
+    bill_provider_segment = segments.generate_nm1_segment('85',2,'',claim.rendering_provider.name,'XX',claim.rendering_provider.npi)   
+    edi_segments.append(bill_provider_segment)
+
+
 
 
     # 2300 Loops CLAIM INFO
+    clm_segment = segments.generate_claim_segment(claim.subscriber, claim.claim_amount)
+    edi_segments.append(clm_segment)
+
+    dt_segment = segments.generate_dtp_segment('435','D8',claim.claim_date)     
+    edi_segments.append(dt_segment)
 
 
+    hi_segment = segments.generate_hi_segment('ABK','E119',None)
+    edi_segments.append(hi_segment)
+
+
+
+    increment = 1
     # 2400 Loops SERVICE LINE INFO
+    for claimline in claim.claim_lines:
+        lx_segment = segments.generate_lx_segment(increment)
+        edi_segments.append(lx_segment)
 
+        sv_segment = segments.generate_sv1_segment(claimline.service_id, claimline.amount, claimline.units)
+        edi_segments.append(sv_segment)
 
-    # Add other segments based on claim data
-    # for claim_line in claim.claim_lines:
-    #     clm_segment = f"CLM*{claim_line.claim_id}*{claim_line.amount}***{claim_line.place_of_service}*{claim_line.facility_code}*{claim_line.frequency_code}~"
-    #     edi_segments.append(clm_segment)
+        ref_segment = segments.generate_ref_segment('6R',claimline.description)
+        edi_segments.append(ref_segment)
 
-
-
-
-
-
-
-
-
+        increment += 1
 
 
 

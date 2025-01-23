@@ -26,15 +26,17 @@ class TestHealthClaim837_Generate(unittest.TestCase):
 
     def test_generate(self):
         #ACT
-        gen = generate_edi('Big Sender', 'Sad Reciever', self.claim)
-
-        
+        gen = generate_edi('Big Sender', 'Sad Reciever', self.claim)        
         
         #ASSERT
         self.assertIsInstance(gen, str)
 
-
         pass
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
