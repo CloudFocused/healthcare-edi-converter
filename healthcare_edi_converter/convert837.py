@@ -3,16 +3,16 @@ from typing import List, Iterator, Optional
 from dataclasses import dataclass, asdict
 from collections import namedtuple
 import pandas as pd
-from .parse837.loops.claim import Claim as ClaimLoop
-from .parse837.loops.service import ServiceInstitutional as ServiceLoop
-from .parse837.segments.utilities import find_identifier,split_segment
-from .parse837.loops.patient import Patient as PatientLoop
-from .parse837.loops.billingprovider import Billingprovider as BillingproviderLoop
-from .parse837.loops.subscriber import Subscriber as SubscriberLoop
-from .parse837.loops.payer import Payer as PayerLoop
+from .parse_837.loops.claim import Claim as ClaimLoop
+from .parse_837.loops.service import ServiceInstitutional as ServiceLoop
+from .parse_837.segments.utilities import find_identifier,split_segment
+from .parse_837.loops.patient import Patient as PatientLoop
+from .parse_837.loops.billingprovider import Billingprovider as BillingproviderLoop
+from .parse_837.loops.subscriber import Subscriber as SubscriberLoop
+from .parse_837.loops.payer import Payer as PayerLoop
 
-from .parse837.models.claim_dto import ClaimData_Flat as ClaimData_Flat
-from .parse837.models.claim_dto import ClaimLine as ClaimLine
+from .parse_837.models.claim_dto import ClaimData_Flat as ClaimData_Flat
+from .parse_837.models.claim_dto import ClaimLine as ClaimLine
 from .utils import flatten_object
 from healthcare_edi_converter.convert_base import Converter_Base
 

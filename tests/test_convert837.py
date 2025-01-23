@@ -27,5 +27,15 @@ class TestHealthClaimConverter(unittest.TestCase):
         
         #converter.to_parquet('tests/sample837Claim.parquet', engine="pyarrow" ,index=False)
 
+
+    def test_generate(self):
+        #ARRANGE
+        
+
+
+
+
+        pass
+
 if __name__ == "__main__":
     unittest.main()
