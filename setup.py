@@ -4,7 +4,7 @@ setup(
     name="healthcare-edi-converter",
     version="0.1.0",
     author="CloudFocus.tech",
-    description="A library to convert Healthcare EDI content strings into objects",
+    description="A library to convert Healthcare EDI content strings and objects",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/CloudFocused/healthcare-edi-converter",
