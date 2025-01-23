@@ -83,6 +83,7 @@ class ClaimLine:
     units: int = 1  # Number of units for the service
     modifier: Optional[str] = None  # Service modifier (if any)
     diagnosis_pointer: List[str] = field(default_factory=list)  # Links to diagnoses
+    
     def to_dict(self):
         """Convert the dataclass to a dictionary."""
         return asdict(self)

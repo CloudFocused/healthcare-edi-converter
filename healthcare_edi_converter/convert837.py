@@ -11,8 +11,8 @@ from .parse_837.loops.billingprovider import Billingprovider as BillingproviderL
 from .parse_837.loops.subscriber import Subscriber as SubscriberLoop
 from .parse_837.loops.payer import Payer as PayerLoop
 
-from .parse_837.models.claim_dto import ClaimData_Flat as ClaimData_Flat
-from .parse_837.models.claim_dto import ClaimLine as ClaimLine
+from .models.claim_dto import ClaimData_Flat as ClaimData_Flat
+from .models.claim_dto import ClaimLine as ClaimLine
 from .utils import flatten_object
 from healthcare_edi_converter.convert_base import Converter_Base
 

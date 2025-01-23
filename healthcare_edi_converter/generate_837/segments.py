@@ -12,7 +12,7 @@ def generate_dtp_segment(date_time_qualifier: str, date_time_period_format: str,
     return f"DTP*{date_time_qualifier}*{date_time_period_format}*{date_time_period}~"
 
 def generate_nm1_segment(entity_type: str, first_name: str, last_name: str, id_type: str, entity_id: str) -> str:
-    return f"NM1*{entity_type}*1*{last_name}*{first_name}****{id_type}*{entity_id}~"
+    return f"NM1*{entity_type}*2*{last_name}*{first_name}****{id_type}*{entity_id}~"
 
 def generate_n3_segment(address_line1: str, address_line2: str = "") -> str:
     return f"N3*{address_line1}*{address_line2}~"

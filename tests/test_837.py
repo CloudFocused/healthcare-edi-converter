@@ -5,8 +5,7 @@ import pandas as pd
 from healthcare_edi_converter.converter import process_file
 
 
-
-class TestHealthClaimConverter(unittest.TestCase):
+class TestHealthClaim837_Parse(unittest.TestCase):
 
 
     # ARRANGE
@@ -23,19 +22,10 @@ class TestHealthClaimConverter(unittest.TestCase):
         #ASSERT
         self.assertIsInstance(converter, pd.DataFrame)
         self.assertGreater(len(converter), 0)
-        print(converter.columns.tolist())
+       # print(converter.columns.tolist())
         
         #converter.to_parquet('tests/sample837Claim.parquet', engine="pyarrow" ,index=False)
 
-
-    def test_generate(self):
-        #ARRANGE
-        
-
-
-
-
-        pass
 
 if __name__ == "__main__":
     unittest.main()
