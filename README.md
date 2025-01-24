@@ -10,12 +10,57 @@ pip install healthcare-edi-converter
 ```
 
 ## Basic Use
-```py
 
-pip install healthcare-edi-converter
+> **Parse an EDI File**
+```py
+    from healthcare_edi_converter.converter import process_file
+    
+    with open("sample837p_01.txt", "r") as f:
+        edi_content = f.read() 
+    converter = process_file('837', edi_content)
+    print(converter)
+
+```
+| Parameter | Values             |
+| --------- | ------------------ |
+| file_type  | The type of file we are trying to convert. For example 837 (Claim)    |
+| file_content | The text content of the file we are converting. NOTE: This is NOT the path      |
+
+
+<br><br>
+
+
+
+
+> **Generate an EDI File**
+```py
+    from healthcare_edi_converter.converter import generate_edi
+    from healthcare_edi_converter.models.claim_dto import ClaimData, ClaimLine, Payer,RenderingProvider
+    payer = Payer('Payer Name', '12345', '123 Sesame Street','555-1212')
+    rendering_provider = RenderingProvider('Provider Name','1003002510',None,'123 Sesame Street')
+
+
+    claimlines =[]
+    claimlines.append(ClaimLine('11111111', '19110', 'Claim Line 1',0.00,2,None,['N61']))
+    claimlines.append(ClaimLine('11111111', '19110', 'Claim Line 2',0.00,2,None,['N61']))
+    claimlines.append(ClaimLine('11111111', '19110', 'Claim Line 3',0.00,2,None,['N61']))
+
+    claim = ClaimData('11111111','2025-01-22','Jane','Doe','1973-10-08','F','12345678',payer,rendering_provider,0.00,['A31','B25'],'TESTCASE','A34512355',claimlines)
+
+    gen = generate_edi('Big Sender', 'Sad Reciever', claim) 
 
 ```
 
+
+| Parameter | Values             |
+| --------- | ------------------ |
+| sender  | Name of the sender |
+| receiver | Name of the receiver      |
+| claim | ClaimData Object with the claim and lines       |
+
+
+
+<br><br>
 
 ## 837P File Overall Structure
 

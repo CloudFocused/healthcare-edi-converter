@@ -24,7 +24,7 @@ def process_file(file_type: str, file_content: str):
 
 
 
-def generate_edi(sender: str, reciever: str, claim: ClaimData) -> str:
+def generate_edi(sender: str, receiver: str, claim: ClaimData) -> str:
     # Implementation to generate EDI from claim and claimlines
 
     edi_segments = []
@@ -33,7 +33,7 @@ def generate_edi(sender: str, reciever: str, claim: ClaimData) -> str:
     #          HEADER INFO
     # **********************************
     # Add ISA segment (Interchange Control Header)
-    isa_segment = f"ISA*00*          *00*          *ZZ*{sender}*ZZ*{reciever}*210101*1253*^*00501*000000905*0*T*:~"
+    isa_segment = f"ISA*00*          *00*          *ZZ*{sender}*ZZ*{receiver}*210101*1253*^*00501*000000905*0*T*:~"
     edi_segments.append(isa_segment)
 
     # Add GS segment (Functional Group Header)
@@ -59,7 +59,7 @@ def generate_edi(sender: str, reciever: str, claim: ClaimData) -> str:
     
 
 
-    reciever_segment = segments.generate_nm1_segment('46',2,None,reciever,'46','2222222')
+    reciever_segment = segments.generate_nm1_segment('46',2,None,receiver,'46','2222222')
     edi_segments.append(reciever_segment)
 
 
@@ -151,10 +151,6 @@ class FileParserFactory837(EdiConverterFactory):
     def create_converter(self) -> Converter_Base:
         return Convert837(self.edi_content)
     
-
-
-
-
 
     pass
 

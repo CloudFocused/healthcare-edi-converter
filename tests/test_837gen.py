@@ -1,9 +1,9 @@
 import unittest
 import pandas as pd
 
-# Import the convert837 module
+# Import the Converter module
 from healthcare_edi_converter.converter import generate_edi
-from healthcare_edi_converter.models.claim_dto import ClaimData, ClaimLine, Payer,RenderingProvider,Subscriber
+from healthcare_edi_converter.models.claim_dto import ClaimData, ClaimLine, Payer,RenderingProvider
 
 
 

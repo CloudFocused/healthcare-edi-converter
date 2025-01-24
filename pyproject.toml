@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "healthcare-edi-converter"  # Must be unique on PyPI
-version = "0.0.1"
+version = "0.0.2"
 description = "A Python library to convert healthcare edi data (837p Claims etc)"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -27,3 +27,4 @@ requires-python = ">=3.7"
 
 [project.urls]
 Homepage = "https://www.cloudfocus.tech"
+Git Repo = "https://github.com/CloudFocused/healthcare-edi-converter"
