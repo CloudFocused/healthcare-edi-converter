@@ -19,7 +19,7 @@ def generate_sv1_segment(service_id: str, amount: float, units: int) -> str:
         amount: float - Charge amount for the service
         units: int - Number of units for the service
     """    
-    return f"SV1*HC:{service_id}*{amount:.2f}:UN*{units}~"
+    return f"SV1*HC:{service_id}*{amount:.2f}*UN*{units}~"
 
 def generate_sv2_segment(revenue_code: str, service_id: str, amount: float, units: int, unit_days: int) -> str:
     """

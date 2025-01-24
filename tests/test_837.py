@@ -10,7 +10,7 @@ class TestHealthClaim837_Parse(unittest.TestCase):
 
     # ARRANGE
     def setUp(self):
-        with open("tests/sample837Claim.txt", "r") as f:
+        with open("tests/111111.edi", "r") as f:
             self.edi_content = f.read() 
 
 
