@@ -47,7 +47,7 @@ pip install healthcare-edi-converter
 
     claim = ClaimData('11111111','2025-01-22','Jane','Doe','1973-10-08','F','12345678',payer,rendering_provider,0.00,['A31','B25'],'TESTCASE','A34512355',claimlines)
 
-    gen = generate_edi('Big Sender', 'Sad Reciever', claim) 
+    gen = generate_edi('Big Sender', 'Sad Receiver', claim) 
 
 ```
 
